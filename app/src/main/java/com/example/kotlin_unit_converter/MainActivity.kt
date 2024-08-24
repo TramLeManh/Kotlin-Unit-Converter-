@@ -27,9 +27,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.kotlin_unit_converter.ui.theme.Kotlin_Unit_ConverterTheme
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,11 +65,17 @@ fun Widget() {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Unit Converter")
+        Text("Unit Converter", style = TextStyle(
+            color = Color.Black,
+            fontWeight = FontWeight.Bold
+        ))
         Spacer(modifier = Modifier.padding(8.dp))
         OutlinedTextField(value = "input", onValueChange = {
             //What should happen, when the value changes
-        }, modifier = Modifier.align(Alignment.CenterHorizontally))
+        }, modifier = Modifier.align(Alignment.CenterHorizontally), textStyle = TextStyle(
+            color = Color.Gray,
+            fontWeight = FontWeight.Light
+        ))
         Spacer(modifier = Modifier.padding(8.dp))
         Row(modifier = Modifier.align(Alignment.CenterHorizontally)) {
             val context = LocalContext.current
