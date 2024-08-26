@@ -1,7 +1,6 @@
 package com.example.kotlin_unit_converter
 
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -11,7 +10,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
@@ -32,9 +34,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.kotlin_unit_converter.ui.theme.Kotlin_Unit_ConverterTheme
@@ -48,8 +50,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             Kotlin_Unit_ConverterTheme {
                 Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
+                    modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
                 ) {
                     Widget()
                 }
@@ -69,10 +70,12 @@ fun Greeting(name: String) {
 enum class TextStyleEnum {
     H1, H2
 }
-fun icon(expand:Boolean): ImageVector {
-    if(expand) return Icons.Filled.KeyboardArrowDown
+
+fun icon(expand: Boolean): ImageVector {
+    if (expand) return Icons.Filled.KeyboardArrowDown
     return Icons.Filled.KeyboardArrowLeft
 }
+
 @Composable
 fun Widget() {
 
@@ -82,12 +85,23 @@ fun Widget() {
     var input by remember {
         mutableStateOf(" ");
     }
-    var first by remember{
+    var first by remember {
         mutableStateOf(false);
     }
-    var second by remember{
+    var second by remember {
         mutableStateOf(false);
     }
+    var from by remember {
+        mutableStateOf(converterFunction.m);
+    }
+    var to by remember {
+        mutableStateOf(converterFunction.km);
+    }
+    var output by remember {
+        mutableStateOf(" ");
+    }
+
+
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -95,45 +109,94 @@ fun Widget() {
     ) {
         Text("Unit Converter", style = textStyle.value)
         Spacer(modifier = Modifier.padding(8.dp))
-        OutlinedTextField(
-            value = input, onValueChange = {
-                input = it
-                //What should happen, when the value changes
-            }, modifier = Modifier.align(Alignment.CenterHorizontally), textStyle = TextStyle(
-                color = Color.Black,
-                fontWeight = FontWeight.Light
-            ), label = { Text("Enter value") }
-        )
-        Spacer(modifier = Modifier.padding(8.dp))
-        Row(modifier = Modifier.align(Alignment.CenterHorizontally)) {
-            val context = LocalContext.current
-            Box {
-                Button(
-                    onClick = {
-                    Toast.makeText(context, "Button clicked", Toast.LENGTH_SHORT).show();
-                    first = true;
-                }) {
-                    Text("Select")
-                    Icon(icon(first), contentDescription = "Localized description")
+        Row(
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .height(100.dp)
+                .fillMaxWidth().padding(start =  10.dp, end = 10.dp)
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f)
+            ) {
+                OutlinedTextField(keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    value = input,
+                    onValueChange = {
+                        input = it
+                        output = " "
+                        // What should happen, when the value changes
+                    },
+                    textStyle = TextStyle(
+                        color = Color.Black, fontWeight = FontWeight.Light
+                    ),
+                    label = { Text("Enter a number") });
+                Box() {
+                    Button(onClick = {
+                        first = true;
+                    }) {
+                        Text(from.toString())
+                        Icon(icon(first), contentDescription = "Localized description")
+                    }
+                    DropdownMenu(expanded = first, onDismissRequest = { first = false }) {
+                        for (test: converterFunction in converterFunction.entries) {
+                            DropdownMenuItem(text = { Text(test.name) },
+                                onClick = { from = test;first = false })
+                        }
+                    }
                 }
-                DropdownMenu(expanded = first, onDismissRequest = { first = false}) {
-                    DropdownMenuItem(text = {Text("Hello")}, onClick = { /*TODO*/ })
-                }
+
             }
-            Spacer(modifier = Modifier.padding(8.dp))
-            Box() {
-                Button(onClick = {
-                    Toast.makeText(context, "Button clicked", Toast.LENGTH_SHORT).show();
-                    second = true;
-                }) {
-                    Text("Click me")
-                    Icon(icon(second), contentDescription = "Localized description")
-                }
-                DropdownMenu(expanded = second, onDismissRequest = { second = false}) {
-                    DropdownMenuItem(text = {Text("Hello")}, onClick = { /*TODO*/ })
+
+            Box(
+                contentAlignment = Alignment.Center, modifier = Modifier.weight(0.1f).padding()
+            ) {
+                Text(
+                    text = "=", style = TextStyle(color = Color.Black, fontWeight = FontWeight.Bold)
+                )
+            }
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f)
+            ) {
+                OutlinedTextField(keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    value = output,
+                    onValueChange = {
+                        output = it
+                        // What should happen, when the value changes
+                    },
+                    textStyle = TextStyle(
+                        color = Color.Black, fontWeight = FontWeight.Light
+                    ),
+                    label = { Text("Converter") });
+                Box() {
+                    Button(onClick = {
+                        second = true;
+                    }) {
+                        Text(to.toString())
+                        Icon(icon(second), contentDescription = "Localized description")
+                    }
+                    DropdownMenu(expanded = second, onDismissRequest = { second = false }) {
+                        for (test: converterFunction in converterFunction.entries) {
+                            DropdownMenuItem(text = { Text(test.name) },
+                                onClick = { to = test;second = false })
+                        }
+                    }
                 }
 
+            }
 
+
+
+        }
+        Spacer(modifier = Modifier.padding(8.dp))
+        Box() {
+            Button(onClick = {
+                val value = input.toDoubleOrNull()
+                if (value != null) {
+                    val result = converterFunction.convert(value, from, to)
+                    output = result.toString()
+                }
+            }) {
+                Text("Convert")
             }
         }
         Box() {

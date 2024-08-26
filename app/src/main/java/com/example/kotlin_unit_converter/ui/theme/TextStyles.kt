@@ -9,7 +9,6 @@ import androidx.compose.ui.unit.sp
 
 val h1 = TextStyle(
     fontWeight = FontWeight.Bold,
-    color = Purple40,
     letterSpacing = 1.5.sp,
     fontSize = 20.sp,
     shadow = Shadow(
