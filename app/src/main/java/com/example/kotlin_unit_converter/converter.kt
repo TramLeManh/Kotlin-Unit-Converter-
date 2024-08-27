@@ -5,19 +5,22 @@ enum class converterFunction {
     m,
     cm,
     mm;
-    companion object{
+
+    companion object {
         private fun conversionToMeters(unit: converterFunction): Double {
-            return when(unit){
+            return when (unit) {
                 km -> 1000.0
                 m -> 1.0
                 cm -> 0.01
                 mm -> 0.001
             }
         }
-        fun convert(value: Double, from: converterFunction,to:converterFunction): Double {
-            val valueInMeters = value*conversionToMeters(from)
-            val factor = 1/conversionToMeters(to)
-            return valueInMeters*factor
+
+        fun convert(value: Double, from: converterFunction, to: converterFunction): Double {
+
+            val valueInMeters = value * conversionToMeters(from)
+            val factor = 1 / conversionToMeters(to)
+            return valueInMeters * factor
         }
     }
 

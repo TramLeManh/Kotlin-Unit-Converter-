@@ -26,6 +26,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -82,7 +83,7 @@ fun Widget() {
     val textStyle = remember {
         mutableStateOf(h1);
     }
-    var input by remember {
+    var input = remember {
         mutableStateOf(" ");
     }
     var first by remember {
@@ -97,7 +98,7 @@ fun Widget() {
     var to by remember {
         mutableStateOf(converterFunction.km);
     }
-    var output by remember {
+    var output = remember {
         mutableStateOf(" ");
     }
 
@@ -112,24 +113,24 @@ fun Widget() {
         Row(
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically,
+
             modifier = Modifier
                 .height(100.dp)
-                .fillMaxWidth().padding(start =  10.dp, end = 10.dp)
+                .fillMaxWidth()
+                .padding(start = 10.dp, end = 10.dp)
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f)
             ) {
-                OutlinedTextField(keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    value = input,
-                    onValueChange = {
-                        input = it
-                        output = " "
-                        // What should happen, when the value changes
-                    },
-                    textStyle = TextStyle(
-                        color = Color.Black, fontWeight = FontWeight.Light
-                    ),
-                    label = { Text("Enter a number") });
+                OutlinedTextField(keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number,
+                    imeAction = androidx.compose.ui.text.input.ImeAction.Default,
+                ), singleLine = true, value = input.value, onValueChange = {
+                    input.value = it
+                    converter(it, from, to, output)
+                }, textStyle = TextStyle(
+                    color = Color.Black, fontWeight = FontWeight.Light
+                ), label = { Text("Enter a number") });
                 Box() {
                     Button(onClick = {
                         first = true;
@@ -146,27 +147,30 @@ fun Widget() {
                 }
 
             }
-
             Box(
-                contentAlignment = Alignment.Center, modifier = Modifier.weight(0.1f).padding()
+                contentAlignment = Alignment.Center, modifier = Modifier
+                    .weight(0.1f)
+                    .fillMaxSize()
             ) {
                 Text(
-                    text = "=", style = TextStyle(color = Color.Black, fontWeight = FontWeight.Bold)
+                    text = "=",
+                    modifier = Modifier.padding(bottom = 20.dp),
+                    style = TextStyle(color = Color.Black, fontWeight = FontWeight.Bold)
                 )
             }
+            //output
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.weight(1f)
             ) {
-                OutlinedTextField(keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    value = output,
-                    onValueChange = {
-                        output = it
-                        // What should happen, when the value changes
-                    },
-                    textStyle = TextStyle(
-                        color = Color.Black, fontWeight = FontWeight.Light
-                    ),
-                    label = { Text("Converter") });
+                OutlinedTextField(keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number,
+                    imeAction = androidx.compose.ui.text.input.ImeAction.Default,
+                ), value = output.value, singleLine = true, onValueChange = {
+                    output.value = it
+                    converter(it, from, to, input)
+                }, textStyle = TextStyle(
+                    color = Color.Black, fontWeight = FontWeight.Light
+                ), label = { Text("Converter") });
                 Box() {
                     Button(onClick = {
                         second = true;
@@ -183,17 +187,14 @@ fun Widget() {
                 }
 
             }
-
-
-
         }
         Spacer(modifier = Modifier.padding(8.dp))
         Box() {
             Button(onClick = {
-                val value = input.toDoubleOrNull()
+                val value = input.value.toDoubleOrNull()
                 if (value != null) {
                     val result = converterFunction.convert(value, from, to)
-                    output = result.toString()
+                    output.value = result.toString()
                 }
             }) {
                 Text("Convert")
@@ -209,6 +210,21 @@ fun Widget() {
                 Text("Change color")
             }
         }
+    }
+}
+
+
+private fun converter(
+    it: String, from: converterFunction, to: converterFunction, output: MutableState<String>
+) {
+    try {
+        val input = it.toDouble()
+        output.value = converterFunction.convert(input, from, to).toString()
+    } catch (e: NumberFormatException) {
+        // Handle invalid numeric input
+        output.value = " "
+        println(e)// Or any other appropriate message
+        // You might also want to log the exception for debugging purposes
     }
 }
 
